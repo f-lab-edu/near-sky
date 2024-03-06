@@ -529,6 +529,18 @@ components:
             현재 산행 일정들을 확인할 수 있습니다.
           items:
             $ref: '#/components/schemas/HikingInfo'
+        pageable:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 0
+            size:
+              type: integer
+              example: 10
+            totalSize:
+              type: integer
+              example: 73
       description: HikingInfo에 대한 리스트
     tesOutput:
       required:
@@ -661,6 +673,22 @@ components:
                 - 's3://ohsu-compbio-funnel/storage'
             type:
               $ref: '#/components/schemas/tesServiceType'
+    FileImage:
+      description: 파일 이미지
+      type: object
+      properties:
+        url:
+          type: string
+          description: '파일 경로'
+          example: '/image/hiking/17'
+        fileName:
+          type: string
+          description: '파일명'
+          example: '감악산1'
+        ext:
+          type: string
+          description: '파일 확장자'
+          example: 'png'
     HikingInfo:
       description: 산행 정보 객체
       type: object
@@ -711,6 +739,10 @@ components:
           description: '산행 설명'
           example: >-
             낙조대(落照臺)에 오르면 멋진 일출과 일몰을 볼 수 있다. 남쪽으로는 대둔산 정상인 마천대가 보인다.
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileImage'
     Service2:
       description: GA4GH service
       type: object
