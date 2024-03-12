@@ -7,9 +7,12 @@ import com.dseoki.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * author: gawain
@@ -37,53 +40,51 @@ public class HikingService {
      */
     public List<HikingResponse> searchHiking() {
         List<HikingResponse> hikingList = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-//        HikingResponse hikingResponse = HikingResponse.builder()
-//                .title("월악산 악어봉 및 잔도길")
-//                .hikeStartDate(DateUtils.getDateAsString(LocalDateTime.of(2024, 3, 9, 9, 30), "yyyy-MM-dd HH:mm"))
-//                .hikeEndDate(DateUtils.getDateAsString(LocalDateTime.of(2024, 3, 9, 17, 30), "yyyy-MM-dd HH:mm"))
-//                .distance(1000)
-//                .elevation(448)
-//                .estimatedDuration(60)
-//                .description("아름다운 이 땅에 금수강산에 단군 할아버지가 터를 잘못 잡으시고... 동쪽에는 지진 서쪽에는 미세먼지 북쪽에는 시베리아 추위....")
-//                .build();
-//
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-//        hikingList.add(hikingResponse);
-
-        List<Hiking> entity = repository.findAll();
-        if (entity != null && entity.size() > 0) {
-            System.out.println("ssssssss");
+        List<Hiking> entitys = repository.findAll();
+        if (entitys != null && entitys.size() > 0) {
+            hikingList = entitys.stream().map(e -> {
+                return HikingResponse.builder()
+                        .id(e.getId())
+                        .title(e.getTitle())
+                        .hikeStartDate(e.getHikeStartDate().format(formatter))
+                        .hikeEndDate(e.getHikeEndDate().format(formatter))
+                        .distance(e.getDistance())
+                        .elevation(e.getElevation())
+                        .estimatedDuration(e.getEstimatedDuration())
+                        .description(e.getDescription())
+                        .build();
+            }).collect(Collectors.toList());
         }
-        System.out.println(entity);
 
         return hikingList;
     }
 
     public HikingResponse getHiking(Long id) {
-        return HikingResponse.builder()
-                .id(id)
-                .title("월악산 악어봉 및 잔도길")
-                .hikeStartDate(DateUtils.getDateAsString(LocalDateTime.of(2024, 3, 9, 9, 30), "yyyy-MM-dd HH:mm"))
-                .hikeEndDate(DateUtils.getDateAsString(LocalDateTime.of(2024, 3, 9, 17, 30), "yyyy-MM-dd HH:mm"))
-                .distance(1000)
-                .elevation(448)
-                .estimatedDuration(60)
-                .description("아름다운 이 땅에 금수강산에 단군 할아버지가 터를 잘못 잡으시고... 동쪽에는 지진 서쪽에는 미세먼지 북쪽에는 시베리아 추위....")
-                .build();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return repository.findById(id).map(e -> {
+            return HikingResponse.builder()
+                    .id(e.getId())
+                    .title(e.getTitle())
+                    .hikeStartDate(e.getHikeStartDate().format(formatter))
+                    .hikeEndDate(e.getHikeEndDate().format(formatter))
+                    .distance(e.getDistance())
+                    .elevation(e.getElevation())
+                    .estimatedDuration(e.getEstimatedDuration())
+                    .description(e.getDescription())
+                    .build();
+        }).orElse(null);
     }
 
     public void insertHiking(HikingDto hikingDto) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
         Hiking hiking = new Hiking();
         hiking.setTitle(hikingDto.getTitle());
-        hiking.setHikeStartDate(LocalDateTime.parse(hikingDto.getHikeStartDate()));
-        hiking.setHikeEndDate(LocalDateTime.parse(hikingDto.getHikeEndDate()));
+        hiking.setHikeStartDate(LocalDateTime.parse(hikingDto.getHikeStartDate(), formatter));
+        hiking.setHikeEndDate(LocalDateTime.parse(hikingDto.getHikeEndDate(), formatter));
         hiking.setDistance(hikingDto.getDistance());
         hiking.setElevation(hikingDto.getElevation());
         hiking.setEstimatedDuration(hikingDto.getEstimatedDuration());
