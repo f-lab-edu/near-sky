@@ -19,7 +19,7 @@ public class MemberController {
     /**
      * 회원 가입
      */
-    @PostMapping("")
+    @PostMapping("/regist")
     public ResponseEntity registMember(@RequestBody MemberSignUpReq memberDto) {
         return new ResponseEntity(service.registMember(memberDto), HttpStatus.OK);
     }

@@ -1,4 +1,4 @@
-package com.dseoki.hikingapi;
+package com.dseoki;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

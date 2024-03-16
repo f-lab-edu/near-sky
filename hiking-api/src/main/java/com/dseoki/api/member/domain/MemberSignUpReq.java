@@ -1,10 +1,14 @@
 package com.dseoki.api.member.domain;
 
 import com.dseoki.api.entity.Member;
-import lombok.Getter;
+import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
+@Setter
 public class MemberSignUpReq {
+
     private String name;
     private String nickname;
     private String password;
@@ -14,16 +18,23 @@ public class MemberSignUpReq {
     private String region;
     private RoleType roleType;
 
-    public Member toEntity() {
+    public Member toEntity(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .name(name)
                 .nickname(nickname)
-                .password(password)
+                .email(email)
+                .password(passwordEncoder.encode(password))
                 .birthday(birthday)
                 .mobile(mobile)
-                .email(email)
                 .region(region)
-                .roleType(roleType)
+                .roleType(RoleType.NORMAL)
                 .build();
+    }
+
+    /**
+     * 패스워드 암호화
+     */
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(password);
     }
 }
