@@ -13,3 +13,6 @@ spring:
     multipart:
       max-file-size: 30MB
       max-request-size: 40MB
+
+resource:
+  image: 'file:\\\D:\Src\git\near-sky\hiking-api\images\'
