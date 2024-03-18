@@ -1,5 +1,6 @@
 package com.dseoki.api.file;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,14 +19,14 @@ public class ImageController {
     private final ImageService service;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(Long targetId, @RequestParam("files") List<MultipartFile> multipartFiles) {
+    public ResponseEntity<String> uploadImage(Long targetId, @RequestParam(name = "files") List<MultipartFile> multipartFiles) {
         String result = service.imageUpload(targetId, multipartFiles);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{targetId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<byte[]> searchImage(@PathVariable Long targetId) throws IOException {
-        return new ResponseEntity<byte[]>(service.searchImage(targetId), HttpStatus.OK);
+    @GetMapping(value = "/{targetId}")
+    public ResponseEntity<List<String>> searchImage(@PathVariable Long targetId) throws IOException {
+        return new ResponseEntity<List<String>>(service.searchImage(targetId), HttpStatus.OK);
     }
 
 }

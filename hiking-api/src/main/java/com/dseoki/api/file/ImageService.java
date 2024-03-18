@@ -2,16 +2,17 @@ package com.dseoki.api.file;
 
 import com.dseoki.api.entity.Image;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,16 +41,11 @@ public class ImageService {
                 if (ObjectUtils.isEmpty(contentType)) {
                     break;
                 } else {
-                    // 이미지 valid
-                    if (contentType.contains("image/jpeg")) {
-                        originFileExtension = ".jpg";
-                    } else if (contentType.contains("image/png")) {
-                        originFileExtension = ".png";
-                    } else if (contentType.contains("image/gif")) {
-                        originFileExtension = ".gif";
-                    } else {
-                        break;
+                    String[] token = contentType.split("/");
+                    if (!token[0].equals("image")) {
+                        return "이미지 파일만 업로드 할 수 있습니다.";
                     }
+                    originFileExtension = ".".concat(token[1]);
                 }
 
                 String fileName = Long.toString(System.nanoTime());
@@ -63,14 +59,14 @@ public class ImageService {
 
                 repository.save(image);
 
-                file = new File(absolutePath + path + "/" + fileName);
+                file = new File(absolutePath + path + "/" + fileName + originFileExtension);
 
                 try {
                     // Files.copy()도 있었다... 대용량에 사용한다던데
                     multipartFile.transferTo(file);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
-                    return "image upload fail...";
+                    return "image upload fail";
                 }
             }
         }
@@ -78,16 +74,11 @@ public class ImageService {
         return "image upload complate!!";
     }
 
-    public byte[] searchImage(Long targetId) throws IOException {
-        Optional<Image> optionalImage = repository.findById(targetId);
-        String directroy = null;
-        if (optionalImage.isPresent()) {
-            Image image = optionalImage.get();
-            directroy = new File(image.getFilePath()).getAbsolutePath();
-        }
-        InputStream is = new FileInputStream(directroy);
-        byte[] imageByteArray = is.readAllBytes();
-        is.close();
-        return imageByteArray;
+    public List<String> searchImage(Long targetId) {
+        List<Image> imageList = repository.findByTargetId(targetId);
+
+        return imageList.stream()
+                .map(image -> "/" + image.getFilePath() + image.getExt())
+                .collect(Collectors.toList());
     }
 }
