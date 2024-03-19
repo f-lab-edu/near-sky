@@ -9,3 +9,10 @@ spring:
     hibernate:
       ddl-auto: update
 #      dialect: org.hibernate.dialect.Oracle12cDialect
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 40MB
+
+resource:
+  image: 'file:\\\D:\Src\git\near-sky\hiking-api\images\'
