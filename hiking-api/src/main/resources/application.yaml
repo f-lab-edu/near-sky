@@ -3,12 +3,10 @@ spring:
     url: jdbc:oracle:thin:@//localhost:1521/xe
     username: near_sky
     password: 1q2w3e4r
-# Hibernate ??
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
-#      dialect: org.hibernate.dialect.Oracle12cDialect
   servlet:
     multipart:
       max-file-size: 30MB
