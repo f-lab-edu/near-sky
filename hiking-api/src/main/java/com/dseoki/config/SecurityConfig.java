@@ -1,9 +1,12 @@
 package com.dseoki.config;
 
 import com.dseoki.api.member.LoginService;
+import com.dseoki.api.member.MemberRepository;
 import com.dseoki.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.dseoki.filter.JwtAuthenticationProcessingFilter;
 import com.dseoki.handler.LoginFailureHandler;
 import com.dseoki.handler.LoginSuccessJWTProvideHandler;
+import com.dseoki.jwt.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +30,8 @@ public class SecurityConfig {
 
     private final LoginService loginService;
     private final ObjectMapper objectMapper;
+    private final MemberRepository memberRepository;
+    private final JwtService jwtService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,13 +43,15 @@ public class SecurityConfig {
                                 frameOptionsConfig.disable()))
                 .httpBasic(AbstractHttpConfigurer::disable) // 인증방법 비활성화 (특정 리소스에 접근할 때 username과 password 물어봄)
                 .formLogin(AbstractHttpConfigurer::disable) // 인증방법 비활성화
-                .addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/v1/login", "/api/v1/member/regist").permitAll()
                         .anyRequest().authenticated())
                 .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
+        http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -60,13 +67,12 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder()); // 비밀번호 암호화
         provider.setUserDetailsService(loginService); // 로그인 처리
-
         return new ProviderManager(provider);
     }
 
     @Bean
     public LoginSuccessJWTProvideHandler loginSuccessJWTProvideHandler(){
-        return new LoginSuccessJWTProvideHandler();
+        return new LoginSuccessJWTProvideHandler(jwtService, memberRepository);
     }
 
     @Bean
@@ -82,4 +88,11 @@ public class SecurityConfig {
         jsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
         return jsonUsernamePasswordLoginFilter;
     }
+
+    @Bean
+    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter(){
+        JwtAuthenticationProcessingFilter jsonUsernamePasswordLoginFilter = new JwtAuthenticationProcessingFilter(jwtService, memberRepository);
+        return jsonUsernamePasswordLoginFilter;
+    }
+
 }

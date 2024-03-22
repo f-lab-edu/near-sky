@@ -12,5 +12,8 @@ spring:
       max-file-size: 30MB
       max-request-size: 40MB
 
+  profiles:
+    include: jwt
+
 resource:
   image: 'file:\\\D:\Src\git\near-sky\hiking-api\images\'
