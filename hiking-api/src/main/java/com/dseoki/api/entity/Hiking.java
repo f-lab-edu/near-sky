@@ -6,16 +6,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * fileName: Hiking
- * author: gawain
- * date: 2024-03-12
- * description:
- * ==============================
- * DATE     AUTHOR      NOTE
- * ------------------------------
- * 2024-03-12  gawain     최초생성
- */
 @Entity
 @Setter
 @Getter

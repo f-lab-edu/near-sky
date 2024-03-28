@@ -1,10 +1,7 @@
 package com.dseoki.api.hiking.domain;
 
-import com.dseoki.api.file.Image;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder
 @Getter
@@ -45,5 +42,5 @@ public class HikingResponse {
      * 산행 설명
      */
     private String description;
-    private List<Image> images;
+
 }
