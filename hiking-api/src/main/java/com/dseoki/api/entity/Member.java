@@ -46,4 +46,15 @@ public class Member {
 
     private RoleType roleType;
 
+    @Column(length = 1000)
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void destroyRefreshToken() {
+        this.refreshToken = null;
+    }
+
 }
